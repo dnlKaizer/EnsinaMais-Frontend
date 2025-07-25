@@ -745,8 +745,19 @@ export class NotasPageComponent implements OnInit {
 
     console.log('Dados sendo enviados para atualizar nota:', dados);
 
+    let apiUrl = "";
+    if (this.authService.isAdmin()) {
+      apiUrl = `/notas/${this.formData.id}`;
+    } else {
+      const professorId = await this.authService.getCurrentUserId();
+      if (!professorId) {
+        throw new Error('Não foi possível obter o ID do professor');
+      }
+      apiUrl = `/professores/${professorId}/notas/${this.formData.id}`;
+    }
+
     const response = await this.authService.authenticatedFetch(
-      `/notas/${this.formData.id}`,
+      apiUrl,
       {
         method: 'PUT',
         headers: {
