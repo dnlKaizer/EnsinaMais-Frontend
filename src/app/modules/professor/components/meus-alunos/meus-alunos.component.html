@@ -1,0 +1,124 @@
+<header class="bg-dark-blue w-100 p-1 d-flex justify-content-between">
+  <h2 class="text-white mx-3">Ensina+</h2>
+  <button
+    type="button"
+    class="btn-clear me-3"
+    (click)="logout()"
+    title="Sair do sistema"
+  >
+    <img
+      src="assets/images/icons/logout-icon.png"
+      alt="Logout Icon"
+      width="28"
+      height="28"
+    />
+  </button>
+</header>
+
+<div class="container pt-3">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1>Meus Alunos</h1>
+      @if (turmaSelecionada) {
+      <p class="text-muted">
+        Turma:
+        {{
+          turmaSelecionada.disciplina?.codigo || "TURMA-" + turmaSelecionada.id
+        }}
+        -
+        {{ turmaSelecionada.disciplina?.nome || "Disciplina não encontrada" }}
+      </p>
+      }
+    </div>
+    <button class="btn btn-secondary" (click)="voltarDashboard()">
+      Voltar ao Dashboard
+    </button>
+  </div>
+
+  <!-- Filtro por Turma -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <label for="turmaSelect" class="form-label">Filtrar por Turma:</label>
+      <select
+        id="turmaSelect"
+        class="form-select"
+        [(ngModel)]="turmaIdSelecionada"
+        (ngModelChange)="onTurmaChange()"
+      >
+        <option value="">Todas as minhas turmas</option>
+        @for (turma of minhasTurmas; track turma.id) {
+        <option [value]="turma.id">
+          {{ turma.disciplina?.codigo || "TURMA-" + turma.id }} -
+          {{ turma.disciplina?.nome || "Disciplina não encontrada" }}
+        </option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      @if (alunos && alunos.length > 0) {
+      <div class="table-responsive">
+        <table class="table table-striped table-hover">
+          <thead class="table-dark">
+            <tr>
+              <th>Matrícula</th>
+              <th>Nome</th>
+              <th>Email</th>
+              <th>Turma</th>
+              <th>Média Atual</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (aluno of alunos; track aluno.id) {
+            <tr>
+              <td>{{ aluno.matricula || aluno.cpf }}</td>
+              <td>{{ aluno.nome }}</td>
+              <td>{{ aluno.email }}</td>
+              <td>
+                {{
+                  aluno.turma?.disciplina?.codigo || "TURMA-" + aluno.turma?.id
+                }}
+              </td>
+              <td>
+                <span [class]="getClasseMedia(aluno.mediaAtual)">
+                  {{ aluno.mediaAtual ? aluno.mediaAtual.toFixed(1) : "-" }}
+                </span>
+              </td>
+              <td>
+                <button
+                  class="btn btn-sm btn-primary me-2"
+                  (click)="verDetalhes(aluno.id)"
+                  title="Ver detalhes do aluno"
+                >
+                  Detalhes
+                </button>
+                <button
+                  class="btn btn-sm btn-warning"
+                  (click)="gerenciarNotas(aluno.id, aluno.turmaId || 0)"
+                  title="Gerenciar notas"
+                  [disabled]="!aluno.turmaId"
+                >
+                  Notas
+                </button>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      } @else {
+      <div class="alert alert-info">
+        <h4>Nenhum aluno encontrado</h4>
+        <p>
+          @if (turmaIdSelecionada) { Não há alunos matriculados na turma
+          selecionada. } @else { Você não possui alunos em suas turmas no
+          momento. }
+        </p>
+      </div>
+      }
+    </div>
+  </div>
+</div>

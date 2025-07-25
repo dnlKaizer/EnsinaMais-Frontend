@@ -1,0 +1,142 @@
+<header class="bg-dark-blue w-100 p-1 d-flex justify-content-between">
+  <h2 class="text-white mx-3">Ensina+</h2>
+  <button
+    type="button"
+    class="btn-clear me-3"
+    (click)="logout()"
+    title="Sair do sistema"
+  >
+    <img
+      src="assets/images/icons/logout-icon.png"
+      alt="Logout Icon"
+      width="28"
+      height="28"
+    />
+  </button>
+</header>
+
+<div class="container pt-3">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1>Minhas Notas</h1>
+      @if (turmaSelecionada) {
+      <p class="text-muted">
+        Turma: {{ turmaSelecionada.codigo }} -
+        {{ turmaSelecionada.disciplina?.nome }}
+      </p>
+      }
+    </div>
+    <button class="btn btn-secondary" (click)="voltarDashboard()">
+      Voltar ao Dashboard
+    </button>
+  </div>
+
+  <!-- Filtro por Turma -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <label for="turmaSelect" class="form-label">Selecionar Turma:</label>
+      <select
+        id="turmaSelect"
+        class="form-select"
+        [(ngModel)]="turmaIdSelecionada"
+        (ngModelChange)="onTurmaChange()"
+      >
+        <option value="">Selecione uma turma</option>
+        @for (turma of minhasTurmas; track turma.id) {
+        <option [value]="turma.id">
+          {{ turma.codigo }} - {{ turma.disciplina?.nome }}
+        </option>
+        }
+      </select>
+    </div>
+  </div>
+
+  @if (turmaIdSelecionada) {
+  <div class="row">
+    <div class="col-12">
+      @if (notasAlunos && notasAlunos.length > 0) {
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Notas dos Alunos</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped table-hover">
+              <thead class="table-dark">
+                <tr>
+                  <th>Matrícula</th>
+                  <th>Nome do Aluno</th>
+                  @for (avaliacao of avaliacoesTurma; track avaliacao.id) {
+                  <th class="text-center">
+                    {{ avaliacao.nome }}<br />
+                    <small>({{ avaliacao.valorTotal }}pts)</small>
+                  </th>
+                  }
+                  <th class="text-center">Média</th>
+                  <th class="text-center">Situação</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (alunoNota of notasAlunos; track alunoNota.aluno.id) {
+                <tr>
+                  <td>{{ alunoNota.aluno.matricula }}</td>
+                  <td>{{ alunoNota.aluno.nome }}</td>
+                  @for (avaliacao of avaliacoesTurma; track avaliacao.id) {
+                  <td class="text-center">
+                    <input
+                      type="number"
+                      class="form-control form-control-sm text-center nota-input"
+                      [value]="getNota(alunoNota.aluno.id, avaliacao.id)"
+                      (blur)="
+                        salvarNota(alunoNota.aluno.id, avaliacao.id, $event)
+                      "
+                      [max]="avaliacao.valorTotal"
+                      min="0"
+                      step="0.1"
+                      placeholder="0.0"
+                    />
+                  </td>
+                  }
+                  <td class="text-center">
+                    <span [class]="getClasseMedia(alunoNota.media)">
+                      {{ alunoNota.media ? alunoNota.media.toFixed(1) : "-" }}
+                    </span>
+                  </td>
+                  <td class="text-center">
+                    <span
+                      [class]="'badge ' + getClasseSituacao(alunoNota.situacao)"
+                    >
+                      {{ alunoNota.situacao }}
+                    </span>
+                  </td>
+                </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <div class="mt-3">
+            <button class="btn btn-primary" (click)="salvarTodasNotas()">
+              Salvar Todas as Notas
+            </button>
+            <button class="btn btn-info ms-2" (click)="exportarNotas()">
+              Exportar Planilha
+            </button>
+          </div>
+        </div>
+      </div>
+      } @else {
+      <div class="alert alert-info">
+        <h4>Nenhum aluno encontrado</h4>
+        <p>Não há alunos matriculados na turma selecionada.</p>
+      </div>
+      }
+    </div>
+  </div>
+  } @else {
+  <div class="alert alert-warning">
+    <h4>Selecione uma turma</h4>
+    <p>Para gerenciar as notas, você deve primeiro selecionar uma turma.</p>
+  </div>
+  }
+</div>

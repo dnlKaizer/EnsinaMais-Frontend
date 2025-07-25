@@ -1,0 +1,101 @@
+<header class="bg-dark-blue w-100 p-1 d-flex justify-content-between">
+    <h2 class="text-white mx-3">Ensina+</h2>
+    <div class="d-flex flex-row">
+        <button type="button" class="btn-clear me-3" (click)="logout()" title="Sair do sistema">
+            <img src="assets/images/icons/logout-icon.png" alt="Logout Icon" width="28" height="28" />
+        </button>
+    </div>
+</header>
+
+<main class="container-fluid p-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="dashboard-title text-center">Portal do Aluno</h1>
+            
+            <!-- Informações do Aluno -->
+            <div class="custom-card mb-4" *ngIf="aluno">
+                <div class="custom-card-header">
+                    <h5 class="mb-0">Informações Pessoais</h5>
+                </div>
+                <div class="custom-card-body">
+                    <div class="info-item">
+                        <span class="info-label">Nome:</span>
+                        <span class="info-value">{{ aluno.nome }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">CPF:</span>
+                        <span class="info-value">{{ aluno.cpf }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Email:</span>
+                        <span class="info-value">{{ aluno.email }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Data de Nascimento:</span>
+                        <span class="info-value">{{ aluno.dataNascimento }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading -->
+            <div class="custom-loading my-4" *ngIf="isLoading">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Carregando...</span>
+                </div>
+                <p class="mt-2 mb-0">Carregando dados...</p>
+            </div>
+
+            <!-- Mensagem de Erro -->
+            <div class="custom-alert custom-alert-danger" *ngIf="errorMessage">
+                {{ errorMessage }}
+            </div>
+
+            <!-- Tabela de Disciplinas -->
+            <div class="custom-card" *ngIf="!isLoading && matriculaTurmas.length > 0">
+                <div class="custom-card-header">
+                    <h5 class="mb-0">Minhas Disciplinas</h5>
+                </div>
+                <div class="custom-card-body">
+                    <div class="custom-table-container">
+                        <table class="table custom-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Semestre</th>
+                                    <th scope="col">Nome da Disciplina</th>
+                                    <th scope="col">Situação</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let matriculaTurma of matriculaTurmas; let i = index" 
+                                    (click)="navegarParaTurma(matriculaTurma.id)"
+                                    role="button"
+                                    tabindex="0"
+                                    (keydown.enter)="navegarParaTurma(matriculaTurma.id)"
+                                    (keydown.space)="navegarParaTurma(matriculaTurma.id)">
+                                    <td>{{ getTurmaBySemestre(i) }}</td>
+                                    <td>{{ getDisciplinaByIndex(i) }}</td>
+                                    <td>
+                                        <span class="custom-badge" 
+                                              [ngClass]="{
+                                                'badge-aprovado': getSituacaoTexto(matriculaTurma.situacao) === 'Aprovado',
+                                                'badge-reprovado': getSituacaoTexto(matriculaTurma.situacao) === 'Reprovado',
+                                                'badge-em-andamento': getSituacaoTexto(matriculaTurma.situacao) === 'Em Andamento'
+                                              }">
+                                            {{ getSituacaoTexto(matriculaTurma.situacao) }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mensagem quando não há dados -->
+            <div class="custom-alert custom-alert-info" *ngIf="!isLoading && matriculaTurmas.length === 0">
+                <i class="fas fa-info-circle me-2"></i>
+                Nenhuma matrícula encontrada.
+            </div>
+        </div>
+    </div>
+</main>

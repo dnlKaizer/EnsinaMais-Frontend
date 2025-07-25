@@ -1,0 +1,85 @@
+<header class="bg-dark-blue w-100 p-1 d-flex justify-content-between">
+  <h2 class="text-white mx-3">Ensina+</h2>
+  <button
+    type="button"
+    class="btn-clear me-3"
+    (click)="logout()"
+    title="Sair do sistema"
+  >
+    <img
+      src="assets/images/icons/logout-icon.png"
+      alt="Logout Icon"
+      width="28"
+      height="28"
+    />
+  </button>
+</header>
+
+<div class="container pt-3">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Minhas Turmas</h1>
+    <button class="btn btn-secondary" (click)="voltarDashboard()">
+      Voltar ao Dashboard
+    </button>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      @if (turmas && turmas.length > 0) {
+      <div class="table-responsive">
+        <table class="table table-striped table-hover">
+          <thead class="table-dark">
+            <tr>
+              <th>Código</th>
+              <th>Disciplina</th>
+              <th>Período</th>
+              <th>Alunos Matriculados</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (turma of turmas; track turma.id) {
+            <tr>
+              <td>{{ turma.disciplina?.codigo || "TURMA-" + turma.id }}</td>
+              <td>
+                {{ turma.disciplina?.nome || "Disciplina não encontrada" }}
+              </td>
+              <td>{{ turma.semestre }}</td>
+              <td>{{ turma.totalAlunos || 0 }}</td>
+              <td>
+                <button
+                  class="btn btn-sm btn-primary me-2"
+                  (click)="verAlunos(turma.id)"
+                  title="Ver alunos da turma"
+                >
+                  Alunos
+                </button>
+                <button
+                  class="btn btn-sm btn-success me-2"
+                  (click)="criarAvaliacao(turma.id)"
+                  title="Criar avaliação"
+                >
+                  Nova Avaliação
+                </button>
+                <button
+                  class="btn btn-sm btn-warning"
+                  (click)="verNotas(turma.id)"
+                  title="Gerenciar notas"
+                >
+                  Notas
+                </button>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      } @else {
+      <div class="alert alert-info">
+        <h4>Nenhuma turma encontrada</h4>
+        <p>Você não possui turmas atribuídas no momento.</p>
+      </div>
+      }
+    </div>
+  </div>
+</div>

@@ -1,0 +1,139 @@
+<header class="bg-dark-blue w-100 p-1 d-flex justify-content-between">
+    <h2 class="text-white mx-3">Ensina+</h2>
+    <div class="d-flex flex-row align-items-center">
+        <button type="button" class="btn-clear me-3 text-white" (click)="voltarDashboard()" title="Voltar ao Dashboard">
+            <span style="font-size: 1.5rem; font-weight: bold;">←</span>
+        </button>
+        <button type="button" class="btn-clear me-3" (click)="logout()" title="Sair do sistema">
+            <img src="assets/images/icons/logout-icon.png" alt="Logout Icon" width="28" height="28" />
+        </button>
+    </div>
+</header>
+
+<main class="container-fluid p-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="dashboard-title">Detalhes da Turma</h1>
+            
+            <!-- Informações da Turma -->
+            <div class="custom-card mb-4" *ngIf="turma && disciplina && professor && matriculaTurma">
+                <div class="custom-card-header">
+                    <h5 class="mb-0">{{ disciplina.nome }} - {{ turma.semestre }}</h5>
+                </div>
+                <div class="custom-card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <span class="info-label">Disciplina:</span>
+                                <span class="info-value">{{ disciplina.nome }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Semestre:</span>
+                                <span class="info-value">{{ turma.semestre }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Vagas:</span>
+                                <span class="info-value">{{ turma.vagas }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <span class="info-label">Professor:</span>
+                                <span class="info-value">{{ professor.nome }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Titulação:</span>
+                                <span class="info-value">{{ professor.titulacao }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Situação:</span>
+                                <span class="custom-badge" 
+                                      [ngClass]="{
+                                        'badge-aprovado': getSituacaoTexto(matriculaTurma.situacao) === 'Aprovado',
+                                        'badge-reprovado': getSituacaoTexto(matriculaTurma.situacao) === 'Reprovado',
+                                        'badge-em-andamento': getSituacaoTexto(matriculaTurma.situacao) === 'Em Andamento'
+                                      }">
+                                    {{ getSituacaoTexto(matriculaTurma.situacao) }}
+                                </span>
+                            </div>
+                            <div class="info-item" *ngIf="matriculaTurma.notaFinal">
+                                <span class="info-label">Nota Final:</span>
+                                <span class="info-value">{{ matriculaTurma.notaFinal }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading -->
+            <div class="custom-loading my-4" *ngIf="isLoading">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Carregando...</span>
+                </div>
+                <p class="mt-2 mb-0">Carregando dados da turma...</p>
+            </div>
+
+            <!-- Mensagem de Erro -->
+            <div class="custom-alert custom-alert-danger" *ngIf="errorMessage">
+                {{ errorMessage }}
+            </div>
+
+            <!-- Tabela de Notas -->
+            <div class="custom-card" *ngIf="!isLoading && avaliacoes.length > 0">
+                <div class="custom-card-header">
+                    <h5 class="mb-0">Minhas Notas</h5>
+                </div>
+                <div class="custom-card-body">
+                    <div class="custom-table-container">
+                        <table class="table custom-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Data</th>
+                                    <th scope="col">Descrição</th>
+                                    <th scope="col">Nota Máxima</th>
+                                    <th scope="col">Minha Nota</th>
+                                    <th scope="col">Percentual</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let avaliacao of avaliacoes; let i = index">
+                                    <td>{{ avaliacao.data | date: 'dd/MM/yyyy' }}</td>
+                                    <td>{{ avaliacao.descricao }}</td>
+                                    <td>{{ avaliacao.notaMaxima }}</td>
+                                    <td>
+                                        <span [ngClass]="{
+                                                'text-success fw-bold': getNotaPorAvaliacao(avaliacao.id) !== null,
+                                                'text-muted': getNotaPorAvaliacao(avaliacao.id) === null
+                                              }">
+                                            {{ getNotaPorAvaliacao(avaliacao.id) || 'Não avaliado' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span *ngIf="getNotaPorAvaliacao(avaliacao.id) !== null"
+                                              class="custom-badge"
+                                              [ngClass]="{
+                                                'badge-aprovado': (getNotaPorAvaliacao(avaliacao.id)! / avaliacao.notaMaxima) >= 0.6,
+                                                'badge-em-andamento': (getNotaPorAvaliacao(avaliacao.id)! / avaliacao.notaMaxima) >= 0.4 && (getNotaPorAvaliacao(avaliacao.id)! / avaliacao.notaMaxima) < 0.6,
+                                                'badge-reprovado': (getNotaPorAvaliacao(avaliacao.id)! / avaliacao.notaMaxima) < 0.4
+                                              }">
+                                            {{ ((getNotaPorAvaliacao(avaliacao.id)! / avaliacao.notaMaxima) * 100).toFixed(1) }}%
+                                        </span>
+                                        <span *ngIf="getNotaPorAvaliacao(avaliacao.id) === null" class="text-muted">
+                                            -
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mensagem quando não há avaliações -->
+            <div class="custom-alert custom-alert-info" *ngIf="!isLoading && avaliacoes.length === 0 && !errorMessage">
+                <i class="fas fa-info-circle me-2"></i>
+                Nenhuma avaliação encontrada para esta turma.
+            </div>
+        </div>
+    </div>
+</main>

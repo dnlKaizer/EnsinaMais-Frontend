@@ -1,0 +1,62 @@
+.table-responsive {
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+.alert {
+  border-radius: 8px;
+}
+
+.table {
+  margin-bottom: 0;
+}
+
+.table th {
+  border-top: none;
+  font-weight: 600;
+}
+
+.table td {
+  vertical-align: middle;
+}
+
+.form-select {
+  border-radius: 8px;
+}
+
+.badge {
+  font-size: 0.75rem;
+}
+
+.bg-prova {
+  background-color: #dc3545 !important;
+}
+
+.bg-trabalho {
+  background-color: #198754 !important;
+}
+
+.bg-exercicio {
+  background-color: #0d6efd !important;
+}
+
+.bg-projeto {
+  background-color: #fd7e14 !important;
+}
+
+.bg-ativa {
+  background-color: #198754 !important;
+}
+
+.bg-encerrada {
+  background-color: #6c757d !important;
+}
+
+.bg-agendada {
+  background-color: #0d6efd !important;
+}

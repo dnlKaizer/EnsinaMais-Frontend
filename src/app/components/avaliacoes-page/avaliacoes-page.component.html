@@ -1,0 +1,396 @@
+<header class="bg-dark-blue w-100 p-1 d-flex justify-content-between">
+  <h2 class="text-white mx-3">Ensina+</h2>
+  <div class="d-flex flex-row">
+    <button
+      type="button"
+      class="btn-clear me-3"
+      (click)="logout()"
+      title="Sair do sistema"
+    >
+      <img
+        src="assets/images/icons/logout-icon.png"
+        alt="Logout Icon"
+        width="28"
+        height="28"
+      />
+    </button>
+    <button
+      type="button"
+      class="btn-clear me-3"
+      (click)="home()"
+      title="Ir para a home"
+    >
+      <img
+        src="assets/images/icons/home-icon.png"
+        alt="Home Icon"
+        width="28"
+        height="28"
+      />
+    </button>
+  </div>
+</header>
+
+<div class="container py-4 d-flex justify-content-between w-100">
+  <h2>Gerenciar Avaliações</h2>
+  <div class="d-flex gap-2">
+    <button class="btn btn-primary" (click)="inserir()">
+      Adicionar Avaliação
+    </button>
+  </div>
+</div>
+
+<!-- Mensagem de erro -->
+<div class="container" *ngIf="errorMessage">
+  <div class="alert alert-danger" role="alert">
+    {{ errorMessage }}
+    <button
+      type="button"
+      class="btn-close"
+      (click)="errorMessage = ''"
+    ></button>
+  </div>
+</div>
+
+<!-- Loading -->
+<div class="container text-center py-4" *ngIf="isLoading">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Carregando...</span>
+  </div>
+  <p class="mt-2">Carregando avaliações...</p>
+</div>
+
+<!-- Header da lista -->
+<div class="bg-light-blue w-100" *ngIf="!isLoading">
+  <div
+    class="container d-flex justify-content-between align-items-center px-5 py-2"
+  >
+    <div class="d-flex flex-row">
+      <h3>Avaliações ({{ avaliacoes.length }})</h3>
+      <button
+        class="btn btn-clear"
+        (click)="recarregar()"
+        title="Recarregar"
+        [disabled]="isLoading"
+      >
+        <img
+          src="assets/images/icons/loading-icon.png"
+          alt="Recarregar"
+          width="24"
+          height="24"
+        />
+      </button>
+    </div>
+    <div class="d-flex flex-row align-items-center h-100">
+      <img
+        class="me-1"
+        src="assets/images/icons/garbage-can-icon.png"
+        alt="Lata de lixo"
+        width="20"
+        height="20"
+      />
+      <span class="me-4">Excluir</span>
+      <img
+        class="me-1"
+        src="assets/images/icons/edit-icon.png"
+        alt="Editar"
+        width="20"
+        height="20"
+      />
+      <span class="">Editar</span>
+    </div>
+  </div>
+</div>
+
+<!-- Lista de avaliações -->
+<div class="container" *ngIf="!isLoading">
+  <!-- Mensagem quando não há avaliações -->
+  <div *ngIf="avaliacoes.length === 0" class="text-center py-5">
+    <h4 class="text-muted">Nenhuma avaliação encontrada</h4>
+    <p class="text-muted">
+      Clique em "Adicionar Avaliação" para cadastrar a primeira avaliação.
+    </p>
+  </div>
+
+  <!-- Loop através da lista de avaliações -->
+  <div
+    *ngFor="let avaliacao of avaliacoes; let i = index"
+    class="bg-white container rounded-pill mt-3 shadow-sm"
+  >
+    <div
+      class="container show-avaliacao d-flex justify-content-between align-items-center px-4 py-1"
+    >
+      <!-- Informações da avaliação -->
+      <div class="d-flex flex-row">
+        <button
+          class="btn-clear me-3 p-0"
+          (click)="abrirModal(avaliacao)"
+          title="Ver detalhes da avaliação"
+        >
+          <img
+            src="assets/images/icons/profile-user-icon.png"
+            alt="Ícone de avaliação"
+            width="24"
+            height="24"
+          />
+        </button>
+        <span class="fw-bold fs-5">
+          {{ avaliacao.descricao || "Descrição não informada" }}
+        </span>
+      </div>
+
+      <!-- Botões de ação -->
+      <div class="d-flex flex-row align-items-center h-100">
+        <button
+          class="btn-clear p-2 me-3"
+          (click)="excluir(avaliacao.id)"
+          title="Excluir avaliação"
+        >
+          <img
+            class=""
+            src="assets/images/icons/garbage-can-icon.png"
+            alt="Excluir"
+            width="24"
+            height="24"
+          />
+        </button>
+        <button
+          class="btn-clear p-2"
+          (click)="editar(avaliacao.id)"
+          title="Editar avaliação"
+        >
+          <img
+            class=""
+            src="assets/images/icons/edit-icon.png"
+            alt="Editar"
+            width="24"
+            height="24"
+          />
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Detalhes/Edição/Criação da Avaliação -->
+<div
+  class="modal fade"
+  [class.show]="showModal"
+  [style.display]="showModal ? 'block' : 'none'"
+  *ngIf="showModal"
+  tabindex="-1"
+  role="dialog"
+>
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+          <i class="fas fa-clipboard-check me-2"></i>
+          {{ getModalTitle() }}
+        </h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          (click)="fecharModal()"
+        ></button>
+      </div>
+
+      <!-- Mensagem de erro -->
+      <div
+        class="alert alert-danger mx-3 mt-3"
+        *ngIf="errorMessage"
+        role="alert"
+      >
+        {{ errorMessage }}
+        <button
+          type="button"
+          class="btn-close"
+          (click)="errorMessage = ''"
+        ></button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Modo Visualização -->
+        <div
+          *ngIf="modalMode === ModalMode.VIEW && selectedAvaliacao"
+          class="row px-5"
+        >
+          <div class="col-6 mb-3">
+            <label class="form-label fw-bold text-muted">Descrição:</label>
+            <p class="fs-5">
+              {{ selectedAvaliacao.descricao || "Descrição não informada" }}
+            </p>
+          </div>
+          <div class="col-6 mb-3">
+            <label class="form-label fw-bold text-muted">Data:</label>
+            <p class="fs-5">{{ formatarData(selectedAvaliacao.data) }}</p>
+          </div>
+          <div class="col-6 mb-3">
+            <label class="form-label fw-bold text-muted">Nota Máxima:</label>
+            <p class="fs-5">
+              <span class="badge bg-success fs-6">{{
+                selectedAvaliacao.notaMaxima
+              }}</span>
+            </p>
+          </div>
+          <div class="col-6 mb-3">
+            <label class="form-label fw-bold text-muted">Turma:</label>
+            <p class="fs-5">
+              <span *ngIf="selectedAvaliacao.idTurma"
+                >Turma ID: {{ selectedAvaliacao.idTurma }}</span
+              >
+              <span *ngIf="!selectedAvaliacao.idTurma" class="text-muted"
+                >Não informado</span
+              >
+            </p>
+          </div>
+          <div class="col-12 mb-3">
+            <label class="form-label fw-bold text-muted">ID do Sistema:</label>
+            <p class="fs-6 text-muted">#{{ selectedAvaliacao.id }}</p>
+          </div>
+        </div>
+
+        <!-- Modo Edição/Criação -->
+        <div
+          *ngIf="modalMode === ModalMode.EDIT || modalMode === ModalMode.CREATE"
+          class="row px-5"
+        >
+          <div class="col-12 mb-3">
+            <label for="descricao" class="form-label fw-bold"
+              >Descrição *</label
+            >
+            <input
+              type="text"
+              class="form-control"
+              id="descricao"
+              [(ngModel)]="formData.descricao"
+              placeholder="Digite a descrição da avaliação"
+              [disabled]="isSubmitting"
+            />
+          </div>
+          <div class="col-6 mb-3">
+            <label for="data" class="form-label fw-bold"
+              >Data da Avaliação *</label
+            >
+            <input
+              type="date"
+              class="form-control"
+              id="data"
+              [(ngModel)]="formData.data"
+              [disabled]="isSubmitting"
+            />
+          </div>
+          <div class="col-6 mb-3">
+            <label for="notaMaxima" class="form-label fw-bold"
+              >Nota Máxima *</label
+            >
+            <input
+              type="number"
+              class="form-control"
+              id="notaMaxima"
+              [(ngModel)]="formData.notaMaxima"
+              placeholder="Ex: 100"
+              min="0"
+              step="0.1"
+              [disabled]="isSubmitting"
+            />
+          </div>
+          <div class="col-12 mb-3">
+            <label for="idTurma" class="form-label fw-bold">
+              Turma * @if (turmaFixa) {
+              <small class="text-muted">(pré-selecionada)</small>
+              }
+            </label>
+            <select
+              class="form-select"
+              id="idTurma"
+              [(ngModel)]="formData.idTurma"
+              [disabled]="isSubmitting || turmaFixa"
+            >
+              <option value="">Selecione uma turma</option>
+              <option *ngFor="let turma of turmas" [value]="turma.id">
+                Turma {{ turma.id }} - {{ turma.semestre }} ({{ turma.vagas }}
+                vagas)
+              </option>
+            </select>
+            @if (turmaFixa) {
+            <small class="text-muted">
+              Esta avaliação será criada para a turma selecionada.
+            </small>
+            }
+          </div>
+          <div class="col-12">
+            <small class="text-muted">* Campos obrigatórios</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <!-- Botões para modo Visualização -->
+        <div *ngIf="modalMode === ModalMode.VIEW">
+          <button
+            type="button"
+            class="btn btn-outline-primary"
+            (click)="abrirModalEdicao(selectedAvaliacao!)"
+          >
+            <i class="fas fa-edit me-1"></i>
+            Editar Avaliação
+          </button>
+          <button
+            type="button"
+            class="btn btn-outline-danger"
+            (click)="excluir(selectedAvaliacao!.id)"
+          >
+            <i class="fas fa-trash me-1"></i>
+            Excluir Avaliação
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="fecharModal()"
+          >
+            Fechar
+          </button>
+        </div>
+
+        <!-- Botões para modo Edição/Criação -->
+        <div
+          *ngIf="modalMode === ModalMode.EDIT || modalMode === ModalMode.CREATE"
+        >
+          <button
+            type="button"
+            class="btn btn-primary mx-2"
+            (click)="salvar()"
+            [disabled]="isSubmitting"
+          >
+            <span
+              *ngIf="isSubmitting"
+              class="spinner-border spinner-border-sm me-2"
+            ></span>
+            <i *ngIf="!isSubmitting" class="fas fa-save me-1"></i>
+            {{
+              modalMode === ModalMode.CREATE
+                ? "Criar Avaliação"
+                : "Salvar Alterações"
+            }}
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="fecharModal()"
+            [disabled]="isSubmitting"
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Backdrop do Modal -->
+<div
+  class="modal-backdrop fade"
+  [class.show]="showModal"
+  *ngIf="showModal"
+  (click)="fecharModal()"
+></div>

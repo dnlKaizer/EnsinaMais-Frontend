@@ -1,0 +1,84 @@
+<header class="bg-dark-blue w-100 p-1 d-flex justify-content-between">
+  <h2 class="text-white mx-3">Ensina+</h2>
+  <button
+    type="button"
+    class="btn-clear me-3"
+    (click)="logout()"
+    title="Sair do sistema"
+  >
+    <img
+      src="assets/images/icons/logout-icon.png"
+      alt="Logout Icon"
+      width="28"
+      height="28"
+    />
+  </button>
+</header>
+
+<div class="container pt-3">
+  <h1 class="text-center pb-4">Dashboard Professor</h1>
+
+  <div *ngIf="isLoading" class="text-center">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Carregando suas turmas...</span>
+    </div>
+    <p class="mt-2">Carregando suas turmas...</p>
+  </div>
+
+  <div
+    *ngIf="!isLoading && turmas.length === 0"
+    class="alert alert-info text-center"
+  >
+    Você não possui turmas atribuídas no momento.
+  </div>
+
+  <div *ngIf="!isLoading && turmas.length > 0" class="mt-4">
+    <h3 class="mb-3">Minhas Turmas</h3>
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th>Disciplina</th>
+            <th>Código</th>
+            <th>Semestre</th>
+            <th>Vagas</th>
+            <th class="text-center">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let turma of turmas">
+            <td>{{ turma.disciplina?.nome || "Não informada" }}</td>
+            <td>{{ turma.disciplina?.codigo || "N/A" }}</td>
+            <td>{{ turma.semestre }}</td>
+            <td>{{ turma.vagas }}</td>
+            <td class="text-center">
+              <div class="btn-group" role="group">
+                <button
+                  (click)="verAlunosDaTurma(turma.id)"
+                  class="btn btn-outline-primary btn-sm"
+                  title="Ver alunos da turma"
+                >
+                  👥 Alunos
+                </button>
+                <button
+                  (click)="gerenciarAvaliacoes(turma.id)"
+                  class="btn btn-outline-success btn-sm"
+                  title="Gerenciar avaliações"
+                >
+                  📝 Avaliações
+                </button>
+                <button
+                  (click)="gerenciarNotas(turma.id)"
+                  class="btn btn-outline-info btn-sm"
+                  title="Gerenciar notas"
+                >
+                  📊 Notas
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

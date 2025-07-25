@@ -1,0 +1,65 @@
+<header class="bg-dark-blue w-100 p-1 d-flex justify-content-between">
+  <h2 class="text-white mx-3">Ensina+</h2>
+  <button
+    type="button"
+    class="btn-clear me-3"
+    (click)="logout()"
+    title="Sair do sistema"
+  >
+    <img
+      src="assets/images/icons/logout-icon.png"
+      alt="Logout Icon"
+      width="28"
+      height="28"
+    />
+  </button>
+</header>
+
+<div
+  class="container d-flex align-items-center justify-content-center flex-column pt-3"
+>
+  <h1 class="text-center pb-4">Dashboard Admin</h1>
+
+  <button
+    class="btn btn-primary btn-home px-4 mb-3 w-100"
+    (click)="goToProfessoresPage()"
+  >
+    Professores
+  </button>
+  <button
+    class="btn btn-primary btn-home px-4 mb-3 w-100"
+    (click)="goToAlunosPage()"
+  >
+    Alunos
+  </button>
+  <button
+    class="btn btn-primary btn-home px-4 mb-3 w-100"
+    (click)="goToAvaliacoesPage()"
+  >
+    Avaliações
+  </button>
+  <button
+    class="btn btn-primary btn-home px-4 mb-3 w-100"
+    (click)="goToMatriculasPage()"
+  >
+    Matrículas
+  </button>
+  <button
+    class="btn btn-primary btn-home px-4 mb-3 w-100"
+    (click)="goToTurmasPage()"
+  >
+    Turmas
+  </button>
+  <button
+    class="btn btn-primary btn-home px-4 mb-3 w-100"
+    (click)="goToDisciplinasPage()"
+  >
+    Disciplinas
+  </button>
+  <button
+    class="btn btn-primary btn-home px-4 mb-3 w-100"
+    (click)="goToNotasPage()"
+  >
+    Notas
+  </button>
+</div>

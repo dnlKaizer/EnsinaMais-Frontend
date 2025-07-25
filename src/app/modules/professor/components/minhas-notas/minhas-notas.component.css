@@ -1,0 +1,77 @@
+.table-responsive {
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.alert {
+  border-radius: 8px;
+}
+
+.table {
+  margin-bottom: 0;
+}
+
+.table th {
+  border-top: none;
+  font-weight: 600;
+}
+
+.table td {
+  vertical-align: middle;
+}
+
+.form-select {
+  border-radius: 8px;
+}
+
+.card {
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.nota-input {
+  width: 80px;
+  margin: 0 auto;
+  border-radius: 4px;
+}
+
+.media-alta {
+  color: #198754;
+  font-weight: bold;
+}
+
+.media-media {
+  color: #fd7e14;
+  font-weight: bold;
+}
+
+.media-baixa {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.badge {
+  font-size: 0.75rem;
+}
+
+.bg-aprovado {
+  background-color: #198754 !important;
+}
+
+.bg-recuperacao {
+  background-color: #fd7e14 !important;
+}
+
+.bg-reprovado {
+  background-color: #dc3545 !important;
+}
+
+.bg-cursando {
+  background-color: #0d6efd !important;
+}
+
+.table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}

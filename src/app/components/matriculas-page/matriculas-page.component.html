@@ -1,0 +1,325 @@
+<header class="bg-dark-blue w-100 p-1 d-flex justify-content-between">
+  <h2 class="text-white mx-3">Ensina+</h2>
+  <div class="d-flex flex-row">
+    <button
+      type="button"
+      class="btn-clear me-3"
+      (click)="logout()"
+      title="Sair do sistema"
+    >
+      <img
+        src="assets/images/icons/logout-icon.png"
+        alt="Logout Icon"
+        width="28"
+        height="28"
+      />
+    </button>
+    <button
+      type="button"
+      class="btn-clear me-3"
+      (click)="home()"
+      title="Ir para a home"
+    >
+      <img
+        src="assets/images/icons/home-icon.png"
+        alt="Home Icon"
+        width="28"
+        height="28"
+      />
+    </button>
+  </div>
+</header>
+
+<div class="container py-4 d-flex justify-content-between w-100">
+  <h2>Gerenciar Matrículas</h2>
+  <div class="d-flex gap-2">
+    <button class="btn btn-primary" (click)="inserir()">
+      Adicionar Matrícula
+    </button>
+  </div>
+</div>
+
+<!-- Mensagem de erro -->
+<div class="container" *ngIf="errorMessage">
+  <div class="alert alert-danger" role="alert">
+    {{ errorMessage }}
+    <button
+      type="button"
+      class="btn-close"
+      (click)="errorMessage = ''"
+    ></button>
+  </div>
+</div>
+
+<!-- Loading -->
+<div class="container text-center py-4" *ngIf="isLoading">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Carregando...</span>
+  </div>
+  <p class="mt-2">Carregando matrículas...</p>
+</div>
+
+<!-- Header da lista -->
+<div class="bg-light-blue w-100" *ngIf="!isLoading">
+  <div
+    class="container d-flex justify-content-between align-items-center px-5 py-2"
+  >
+    <div class="d-flex flex-row">
+      <h3>Matrículas ({{ matriculas.length }})</h3>
+      <button
+        class="btn btn-clear"
+        (click)="recarregar()"
+        title="Recarregar"
+        [disabled]="isLoading"
+      >
+        <img
+          src="assets/images/icons/loading-icon.png"
+          alt="Recarregar"
+          width="24"
+          height="24"
+        />
+      </button>
+    </div>
+    <div class="d-flex flex-row align-items-center h-100">
+      <img
+        class="me-1"
+        src="assets/images/icons/garbage-can-icon.png"
+        alt="Lata de lixo"
+        width="20"
+        height="20"
+      />
+      <span class="me-4">Excluir</span>
+      <img
+        class="me-1"
+        src="assets/images/icons/edit-icon.png"
+        alt="Editar"
+        width="20"
+        height="20"
+      />
+      <span class="">Editar</span>
+    </div>
+  </div>
+</div>
+
+<!-- Lista de matrículas -->
+<div class="container" *ngIf="!isLoading">
+  <!-- Mensagem quando não há matrículas -->
+  <div *ngIf="matriculas.length === 0" class="text-center py-5">
+    <h4 class="text-muted">Nenhuma matrícula encontrado</h4>
+    <p class="text-muted">
+      Clique em "Adicionar Matrícula" para cadastrar a primeira matrícula.
+    </p>
+  </div>
+
+  <!-- Loop através da lista de matrículas -->
+  <div
+    *ngFor="let matricula of matriculas; let i = index"
+    class="bg-white container rounded-pill mt-3 shadow-sm"
+  >
+    <div
+      class="container d-flex justify-content-between align-items-center px-4 py-1"
+    >
+      <!-- Informações da matrícula -->
+      <div class="d-flex flex-row">
+        <button
+          class="btn-clear me-3 p-0"
+          (click)="abrirModal(matricula)"
+          title="Ver detalhes da matrícula"
+        >
+          <img
+            src="assets/images/icons/profile-user-icon.png"
+            alt="Ícone de usuário"
+            width="24"
+            height="24"
+          />
+        </button>
+        <span class="fw-bold fs-5">
+          {{ matricula.numero }}
+        </span>
+      </div>
+
+      <!-- Botões de ação -->
+      <div class="d-flex flex-row align-items-center h-100">
+        <button
+          class="btn-clear p-2 me-3"
+          (click)="excluir(matricula.id)"
+          title="Excluir matrícula"
+        >
+          <img
+            class=""
+            src="assets/images/icons/garbage-can-icon.png"
+            alt="Excluir"
+            width="24"
+            height="24"
+          />
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Detalhes/Edição/Criação da Matrícula -->
+<div
+  class="modal fade"
+  [class.show]="showModal"
+  [style.display]="showModal ? 'block' : 'none'"
+  *ngIf="showModal"
+  tabindex="-1"
+  role="dialog"
+>
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+          <i class="fas fa-user-tie me-2"></i>
+          {{ getModalTitle() }}
+        </h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          (click)="fecharModal()"
+        ></button>
+      </div>
+
+      <!-- Mensagem de erro -->
+      <div
+        class="alert alert-danger mx-3 mt-3"
+        *ngIf="errorMessage"
+        role="alert"
+      >
+        {{ errorMessage }}
+        <button
+          type="button"
+          class="btn-close"
+          (click)="errorMessage = ''"
+        ></button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Modo Visualização -->
+        <div
+          *ngIf="modalMode === ModalMode.VIEW && selectedMatricula"
+          class="row px-5"
+        >
+          <div class="col-6 mb-3">
+            <label class="form-label fw-bold text-muted">Número:</label>
+            <p class="fs-5">{{ selectedMatricula.numero }}</p>
+          </div>
+          <div class="col-6 mb-3">
+            <label class="form-label fw-bold text-muted">Data:</label>
+            <p class="fs-5">{{ selectedMatricula.data }}</p>
+          </div>
+          <div class="col-6 mb-3">
+            <label class="form-label fw-bold text-muted">Aluno:</label>
+            <p class="fs-5">{{ getNomeAluno(selectedMatricula.idAluno) }}</p>
+          </div>
+          <div class="col-12 mb-3">
+            <label class="form-label fw-bold text-muted">ID do Sistema:</label>
+            <p class="fs-6 text-muted">#{{ selectedMatricula.id }}</p>
+          </div>
+        </div>
+
+        <!-- Modo Edição/Criação -->
+        <div *ngIf="modalMode === ModalMode.CREATE" class="row px-5">
+          <div class="col-12 mb-3">
+            <label for="numero" class="form-label fw-bold">Número *</label>
+            <input
+              type="string"
+              class="form-control"
+              id="numero"
+              [(ngModel)]="formData.numero"
+              placeholder="Digite o número"
+              [disabled]="isSubmitting"
+            />
+          </div>
+          <div class="col-6 mb-3">
+            <label for="data" class="form-label fw-bold">Data *</label>
+            <input
+              type="text"
+              class="form-control"
+              id="data"
+              [(ngModel)]="formData.data"
+              placeholder="YYYY-MM-DD"
+              [disabled]="isSubmitting"
+            />
+          </div>
+          <div class="col-6 mb-3">
+            <label for="idAluno" class="form-label fw-bold">Aluno *</label>
+            <select
+              class="form-select"
+              id="idAluno"
+              [(ngModel)]="formData.idAluno"
+              [disabled]="isSubmitting"
+            >
+              <option value="0">Selecione um aluno...</option>
+              <option *ngFor="let aluno of alunos" [value]="aluno.id">
+                {{ aluno.nome }} ({{ aluno.email }})
+              </option>
+            </select>
+          </div>
+          <div class="col-12">
+            <small class="text-muted">* Campos obrigatórios</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <!-- Botões para modo Visualização -->
+        <div *ngIf="modalMode === ModalMode.VIEW">
+          <button
+            type="button"
+            class="btn btn-outline-danger"
+            (click)="excluir(selectedMatricula!.id)"
+          >
+            <i class="fas fa-trash me-1"></i>
+            Excluir Matrícula
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="fecharModal()"
+          >
+            Fechar
+          </button>
+        </div>
+
+        <!-- Botões para modo Edição/Criação -->
+        <div *ngIf="modalMode === ModalMode.CREATE">
+          <button
+            type="button"
+            class="btn btn-primary"
+            (click)="salvar()"
+            [disabled]="isSubmitting"
+          >
+            <span
+              *ngIf="isSubmitting"
+              class="spinner-border spinner-border-sm me-2"
+            ></span>
+            <i *ngIf="!isSubmitting" class="fas fa-save me-1"></i>
+            {{
+              modalMode === ModalMode.CREATE
+                ? "Criar Matrícula"
+                : "Salvar Alterações"
+            }}
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="fecharModal()"
+            [disabled]="isSubmitting"
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Backdrop do Modal -->
+<div
+  class="modal-backdrop fade"
+  [class.show]="showModal"
+  *ngIf="showModal"
+  (click)="fecharModal()"
+></div>

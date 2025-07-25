@@ -1,0 +1,49 @@
+<header class="bg-dark-blue w-100 p-1 d-flex justify-content-between">
+    <h2 class="text-white mx-3">Ensina+</h2>
+</header>
+<div class="container px-3 pt-3 pb-5 mh-100">
+    <h1 class="text-center pb-4">Autenticação de Usuário</h1>
+    <form (ngSubmit)="autenticar()">
+        <!-- Mensagem de erro -->
+        <div class="alert alert-danger" *ngIf="errorMessage" role="alert">
+            {{ errorMessage }}
+        </div>
+
+        <div class="mb-3">
+            <label class="mb-1" for="login">Nome de Usuário</label>
+            <input 
+                class="form-control" 
+                type="text" 
+                name="login" 
+                id="login" 
+                placeholder="Digite o nome de usuário" 
+                [(ngModel)]="login"
+                (input)="clearError()"
+                [disabled]="isLoading"
+                required
+            />
+        </div>
+        <div class="mb-5">
+            <label class="mb-1" for="senha">Senha</label>
+            <input 
+                class="form-control" 
+                type="password" 
+                name="senha" 
+                id="senha" 
+                placeholder="Digite a senha" 
+                [(ngModel)]="senha"
+                (input)="clearError()"
+                [disabled]="isLoading"
+                required
+            />
+        </div>
+        <button 
+            class="btn btn-primary px-4" 
+            type="submit"
+            [disabled]="isLoading || !login || !senha"
+        >
+            <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" role="status"></span>
+            {{ isLoading ? 'Entrando...' : 'Entrar' }}
+        </button>
+    </form>
+</div>

@@ -1,0 +1,211 @@
+<div class="professor-dashboard">
+  <!-- Header padrão -->
+  <header class="bg-dark-blue w-100 p-1 d-flex justify-content-between">
+    <h2 class="text-white mx-3">Ensina+</h2>
+    <div class="d-flex flex-row">
+      <button
+        type="button"
+        class="btn-clear me-3"
+        (click)="logout()"
+        title="Sair do sistema"
+      >
+        <img
+          src="assets/images/icons/logout-icon.png"
+          alt="Logout Icon"
+          width="28"
+          height="28"
+        />
+      </button>
+      <button
+        type="button"
+        class="btn-clear me-3"
+        (click)="home()"
+        title="Ir para a home"
+      >
+        <img
+          src="assets/images/icons/home-icon.png"
+          alt="Home Icon"
+          width="28"
+          height="28"
+        />
+      </button>
+    </div>
+  </header>
+
+  <!-- Conteúdo principal -->
+  <main class="container mt-4">
+    <!-- Estado de carregamento -->
+    <div *ngIf="isLoading" class="text-center py-5">
+      <div class="spinner-border text-primary mb-3" role="status">
+        <span class="visually-hidden">Carregando...</span>
+      </div>
+      <p class="text-muted">Carregando suas turmas...</p>
+    </div>
+
+    <!-- Estado vazio -->
+    <div *ngIf="!isLoading && turmas.length === 0" class="text-center py-5">
+      <h3 class="text-muted mb-3">Nenhuma turma encontrada</h3>
+      <p class="text-muted">Você não possui turmas atribuídas no momento.</p>
+    </div>
+
+    <!-- Tabela de turmas -->
+    <div *ngIf="!isLoading && turmas.length > 0">
+      <div class="row mb-4">
+        <div class="col">
+          <h2 class="h3 fw-bold mb-1" style="color: var(--color-dark-blue)">
+            Minhas Turmas
+          </h2>
+          <p class="text-muted mb-0">
+            Gerencie suas disciplinas e acompanhe os alunos
+          </p>
+        </div>
+        <div class="col-auto">
+          <span class="badge bg-light-blue text-white fs-6 px-3 py-2">
+            {{ turmas.length }} {{ turmas.length === 1 ? "turma" : "turmas" }}
+          </span>
+        </div>
+      </div>
+
+      <div class="card border-0 shadow">
+        <table class="table table-striped mb-0">
+          <thead class="bg-dark-blue text-white">
+            <tr>
+              <th class="border-0 py-3 px-4">Disciplina</th>
+              <th class="border-0 py-3 px-4">Código</th>
+              <th class="border-0 py-3 px-4">Semestre</th>
+              <th class="border-0 py-3 px-4">Vagas</th>
+              <th class="border-0 py-3 px-4 text-center">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let turma of turmas; trackBy: trackByTurmaId">
+              <td class="py-3 px-4">
+                <div class="fw-bold" style="color: var(--color-dark-blue)">
+                  {{ turma.disciplina?.nome || "Não informada" }}
+                </div>
+              </td>
+              <td class="py-3 px-4">
+                <span class="badge bg-very-light-blue text-dark px-2 py-1">
+                  {{ turma.disciplina?.codigo || "N/A" }}
+                </span>
+              </td>
+              <td class="py-3 px-4">{{ turma.semestre }}</td>
+              <td class="py-3 px-4">{{ turma.vagas }}</td>
+              <td class="py-3 px-4">
+                <div class="d-flex gap-2 justify-content-center">
+                  <button
+                    (click)="verAlunosDaTurma(turma.id)"
+                    class="btn btn-sm btn-primary"
+                    title="Ver alunos da turma"
+                  >
+                    Alunos
+                  </button>
+                  <button
+                    (click)="gerenciarAvaliacoes(turma.id)"
+                    class="btn btn-success btn-sm"
+                    title="Gerenciar avaliações"
+                  >
+                    Avaliações
+                  </button>
+                  <button
+                    (click)="gerenciarNotas(turma.id)"
+                    class="btn btn-info btn-sm"
+                    title="Gerenciar notas"
+                  >
+                    Notas
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal de Alunos da Turma -->
+  <div
+    *ngIf="showAlunosModal"
+    class="modal d-block"
+    style="background: rgba(0, 0, 0, 0.5)"
+    (click)="fecharModalAlunos()"
+  >
+    <div class="modal-dialog modal-lg" (click)="$event.stopPropagation()">
+      <div class="modal-content">
+        <div class="modal-header bg-dark-blue text-white">
+          <h5 class="modal-title">
+            Alunos Matriculados - {{ turmaSelecionada?.disciplina?.nome }} ({{
+              turmaSelecionada?.semestre
+            }})
+          </h5>
+          <button
+            type="button"
+            class="btn-close btn-close-white"
+            (click)="fecharModalAlunos()"
+            title="Fechar"
+          ></button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Loading -->
+          <div *ngIf="isLoadingAlunos" class="text-center py-4">
+            <div class="spinner-border text-primary mb-3" role="status">
+              <span class="visually-hidden">Carregando alunos...</span>
+            </div>
+            <p class="text-muted">Carregando alunos da turma...</p>
+          </div>
+
+          <!-- Lista de alunos -->
+          <div *ngIf="!isLoadingAlunos">
+            <div *ngIf="alunosDaTurma.length === 0" class="text-center py-4">
+              <h5 class="text-muted mb-2">Nenhum aluno matriculado</h5>
+              <p class="text-muted">
+                Esta turma ainda não possui alunos matriculados.
+              </p>
+            </div>
+
+            <div *ngIf="alunosDaTurma.length > 0">
+              <p class="text-muted mb-3">
+                {{ alunosDaTurma.length }}
+                {{
+                  alunosDaTurma.length === 1
+                    ? "aluno matriculado"
+                    : "alunos matriculados"
+                }}
+              </p>
+
+              <table class="table table-striped">
+                <thead class="bg-very-light-blue">
+                  <tr>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>CPF</th>
+                    <th>Data de Nascimento</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let aluno of alunosDaTurma">
+                    <td>{{ aluno.nome }}</td>
+                    <td>{{ aluno.email }}</td>
+                    <td>{{ aluno.cpf }}</td>
+                    <td>{{ aluno.dataNascimento | date : "dd/MM/yyyy" }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="fecharModalAlunos()"
+          >
+            Fechar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
