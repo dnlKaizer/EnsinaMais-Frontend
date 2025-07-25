@@ -239,16 +239,16 @@
             <p class="fs-5">{{ selectedTurma.vagas }}</p>
           </div>
           <div class="col-6 mb-3">
-            <label class="form-label fw-bold text-muted"
-              >Id da Disciplina:</label
-            >
-            <p class="fs-5">{{ selectedTurma.idDisciplina }}</p>
+            <label class="form-label fw-bold text-muted">Disciplina:</label>
+            <p class="fs-5">
+              {{ getNomeDisciplina(selectedTurma.idDisciplina) }}
+            </p>
           </div>
           <div class="col-6 mb-3">
-            <label class="form-label fw-bold text-muted"
-              >Id do Professor:</label
-            >
-            <p class="fs-5">{{ selectedTurma.idProfessor }}</p>
+            <label class="form-label fw-bold text-muted">Professor:</label>
+            <p class="fs-5">
+              {{ getNomeProfessor(selectedTurma.idProfessor) }}
+            </p>
           </div>
           <div class="col-12 mb-3">
             <label class="form-label fw-bold text-muted">ID do Sistema:</label>
@@ -285,29 +285,41 @@
           </div>
           <div class="col-6 mb-3">
             <label for="idDisciplina" class="form-label fw-bold"
-              >Id da Disciplina</label
+              >Disciplina *</label
             >
-            <input
-              type="number"
-              class="form-control"
+            <select
+              class="form-select"
               id="idDisciplina"
               [(ngModel)]="formData.idDisciplina"
-              placeholder="Digite o id"
               [disabled]="isSubmitting"
-            />
+            >
+              <option value="0">Selecione uma disciplina</option>
+              <option
+                *ngFor="let disciplina of disciplinas"
+                [value]="disciplina.id"
+              >
+                {{ disciplina.nome }}
+              </option>
+            </select>
           </div>
           <div class="col-6 mb-3">
             <label for="idProfessor" class="form-label fw-bold"
-              >Id do Professor</label
+              >Professor *</label
             >
-            <input
-              type="number"
-              class="form-control"
+            <select
+              class="form-select"
               id="idProfessor"
               [(ngModel)]="formData.idProfessor"
-              placeholder="Digite o id"
               [disabled]="isSubmitting"
-            />
+            >
+              <option value="0">Selecione um professor</option>
+              <option
+                *ngFor="let professor of professores"
+                [value]="professor.id"
+              >
+                {{ professor.nome }}
+              </option>
+            </select>
           </div>
           <div class="col-12">
             <small class="text-muted">* Campos obrigatórios</small>

@@ -35,7 +35,7 @@ export interface UserData {
 })
 export class AuthService {
   // URL base da API backend
-  private apiUrl = 'https://ensinamais-backend.onrender.com';
+  private apiUrl = 'http://localhost:8080';
 
   constructor() {}
 
@@ -215,7 +215,12 @@ export class AuthService {
    * @returns true se o usuário possui role ADMIN, false caso contrário
    */
   isAdmin(): boolean {
-    return this.hasRole('ADMIN');
+    const userData = this.getTokenPayload();
+    console.log('Token payload:', userData);
+    console.log('User roles:', userData?.roles);
+    const result = this.hasRole('ROLE_ADMIN');
+    console.log('isAdmin result:', result);
+    return result;
   }
 
   /**
@@ -223,7 +228,7 @@ export class AuthService {
    * @returns true se o usuário possui role PROFESSOR, false caso contrário
    */
   isProfessor(): boolean {
-    return this.hasRole('PROFESSOR');
+    return this.hasRole('ROLE_PROFESSOR');
   }
 
   /**
@@ -231,7 +236,7 @@ export class AuthService {
    * @returns true se o usuário possui role ALUNO, false caso contrário
    */
   isAluno(): boolean {
-    return this.hasRole('ALUNO');
+    return this.hasRole('ROLE_ALUNO');
   }
 
   /**

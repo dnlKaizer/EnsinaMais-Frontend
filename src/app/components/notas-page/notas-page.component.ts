@@ -26,6 +26,22 @@ interface AlunoMatriculado {
   idAluno: number;
   nomeAluno: string;
   cpfAluno: string;
+  nomeTurma: string;
+  semestreTurma: string;
+  nomeDisciplina: string;
+}
+
+// Interface para dados completos de MatriculaTurma
+interface MatriculaTurmaCompleta {
+  idMatriculaTurma: number;
+  idAluno: number;
+  nomeAluno: string;
+  cpfAluno: string;
+  idTurma: number;
+  semestreTurma: string;
+  idDisciplina: number;
+  nomeDisciplina: string;
+  nomeTurma: string;
 }
 
 // Enum para os modos do modal
@@ -51,6 +67,8 @@ export class NotasPageComponent implements OnInit {
   // Listas para os selects
   avaliacoesDaTurma: Avaliacao[] = [];
   alunosMatriculados: AlunoMatriculado[] = [];
+  todasAvaliacoes: Avaliacao[] = [];
+  todasMatriculasTurma: MatriculaTurmaCompleta[] = [];
 
   // Propriedades do modal
   showModal: boolean = false;
@@ -91,9 +109,10 @@ export class NotasPageComponent implements OnInit {
       await this.carregarAlunosMatriculados();
     } else {
       console.log(
-        'Nenhum filtro de turma aplicado - carregando todas as avaliações'
+        'Nenhum filtro de turma aplicado - carregando todos os dados para admin'
       );
-      await this.carregarAvaliacoesDaTurma();
+      await this.carregarTodasAvaliacoes();
+      await this.carregarTodasMatriculasTurma();
     }
   }
 
@@ -296,6 +315,113 @@ export class NotasPageComponent implements OnInit {
   }
 
   /**
+   * Carrega todas as avaliações disponíveis (para admin)
+   */
+  async carregarTodasAvaliacoes(): Promise<void> {
+    try {
+      const response = await this.authService.authenticatedFetch('/avaliacoes');
+      if (response.ok) {
+        this.todasAvaliacoes = await response.json();
+        console.log('Todas as avaliações carregadas:', this.todasAvaliacoes);
+      } else {
+        console.error(
+          'Erro ao carregar todas as avaliações:',
+          response.statusText
+        );
+      }
+    } catch (error) {
+      console.error('Erro ao carregar todas as avaliações:', error);
+    }
+  }
+
+  /**
+   * Carrega todas as matrículas-turma com informações completas (para admin)
+   */
+  async carregarTodasMatriculasTurma(): Promise<void> {
+    try {
+      console.log('Carregando todas as matrículas-turma...');
+
+      // Buscar todas as matrículas-turma
+      const matriculasTurmaResponse = await this.authService.authenticatedFetch(
+        '/matriculas-turmas'
+      );
+      if (!matriculasTurmaResponse.ok) {
+        throw new Error('Erro ao carregar matrículas-turma');
+      }
+      const matriculasTurma = await matriculasTurmaResponse.json();
+      console.log('Todas as matriculas-turmas:', matriculasTurma);
+
+      // Buscar todas as matrículas
+      const matriculasResponse = await this.authService.authenticatedFetch(
+        '/matriculas'
+      );
+      if (!matriculasResponse.ok) {
+        throw new Error('Erro ao carregar matrículas');
+      }
+      const matriculas = await matriculasResponse.json();
+
+      // Buscar todos os alunos
+      const alunosResponse = await this.authService.authenticatedFetch(
+        '/alunos'
+      );
+      if (!alunosResponse.ok) {
+        throw new Error('Erro ao carregar alunos');
+      }
+      const alunos = await alunosResponse.json();
+
+      // Buscar todas as turmas
+      const turmasResponse = await this.authService.authenticatedFetch(
+        '/turmas'
+      );
+      if (!turmasResponse.ok) {
+        throw new Error('Erro ao carregar turmas');
+      }
+      const turmas = await turmasResponse.json();
+
+      // Buscar todas as disciplinas
+      const disciplinasResponse = await this.authService.authenticatedFetch(
+        '/disciplinas'
+      );
+      if (!disciplinasResponse.ok) {
+        throw new Error('Erro ao carregar disciplinas');
+      }
+      const disciplinas = await disciplinasResponse.json();
+
+      // Construir lista completa
+      this.todasMatriculasTurma = matriculasTurma.map((mt: any) => {
+        const matricula = matriculas.find((m: any) => m.id === mt.idMatricula);
+        const aluno = alunos.find((a: any) => a.id === matricula?.idAluno);
+        const turma = turmas.find((t: any) => t.id === mt.idTurma);
+        const disciplina = disciplinas.find(
+          (d: any) => d.id === turma?.idDisciplina
+        );
+
+        return {
+          idMatriculaTurma: mt.id,
+          idAluno: matricula?.idAluno || 0,
+          nomeAluno: aluno?.nome || 'Nome não encontrado',
+          cpfAluno: aluno?.cpf || 'CPF não encontrado',
+          idTurma: mt.idTurma,
+          semestreTurma: turma?.semestre || 'Semestre não encontrado',
+          idDisciplina: turma?.idDisciplina || 0,
+          nomeDisciplina: disciplina?.nome || 'Disciplina não encontrada',
+          nomeTurma: `${disciplina?.nome || 'Disciplina'} - ${
+            turma?.semestre || 'Semestre'
+          }`,
+        };
+      });
+
+      console.log(
+        'Todas as matrículas-turma carregadas:',
+        this.todasMatriculasTurma
+      );
+    } catch (error) {
+      console.error('Erro ao carregar todas as matrículas-turma:', error);
+      this.todasMatriculasTurma = [];
+    }
+  }
+
+  /**
    * Recarrega a lista de notas
    */
   async recarregar(): Promise<void> {
@@ -306,7 +432,11 @@ export class NotasPageComponent implements OnInit {
    * Obtém o nome da avaliação pelo ID
    */
   getAvaliacaoNome(idAvaliacao: number): string {
-    const avaliacao = this.avaliacoesDaTurma.find((a) => a.id === idAvaliacao);
+    // Para admin (sem filtro de turma), usar todas as avaliações
+    const listaAvaliacoes = this.turmaIdFiltro
+      ? this.avaliacoesDaTurma
+      : this.todasAvaliacoes;
+    const avaliacao = listaAvaliacoes.find((a) => a.id === idAvaliacao);
     return avaliacao ? avaliacao.descricao : `Avaliação #${idAvaliacao}`;
   }
 
@@ -314,10 +444,21 @@ export class NotasPageComponent implements OnInit {
    * Obtém o nome do aluno pelo ID da matrícula-turma
    */
   getAlunoNome(idMatriculaTurma: number): string {
-    const aluno = this.alunosMatriculados.find(
-      (a) => a.idMatriculaTurma === idMatriculaTurma
-    );
-    return aluno ? aluno.nomeAluno : `Matrícula #${idMatriculaTurma}`;
+    if (this.turmaIdFiltro) {
+      // Para professor (com filtro de turma)
+      const aluno = this.alunosMatriculados.find(
+        (a) => a.idMatriculaTurma === idMatriculaTurma
+      );
+      return aluno ? aluno.nomeAluno : `Matrícula #${idMatriculaTurma}`;
+    } else {
+      // Para admin (sem filtro de turma)
+      const matricula = this.todasMatriculasTurma.find(
+        (mt) => mt.idMatriculaTurma === idMatriculaTurma
+      );
+      return matricula
+        ? `${matricula.nomeAluno} (${matricula.nomeTurma})`
+        : `Matrícula #${idMatriculaTurma}`;
+    }
   }
 
   /**
@@ -395,11 +536,20 @@ export class NotasPageComponent implements OnInit {
 
     // Carregar dados para os selects se ainda não foram carregados
     if (this.turmaIdFiltro) {
+      // Modo professor (com filtro de turma)
       if (this.avaliacoesDaTurma.length === 0) {
         await this.carregarAvaliacoesDaTurma();
       }
       if (this.alunosMatriculados.length === 0) {
         await this.carregarAlunosMatriculados();
+      }
+    } else {
+      // Modo admin (sem filtro de turma)
+      if (this.todasAvaliacoes.length === 0) {
+        await this.carregarTodasAvaliacoes();
+      }
+      if (this.todasMatriculasTurma.length === 0) {
+        await this.carregarTodasMatriculasTurma();
       }
     }
 
@@ -416,11 +566,20 @@ export class NotasPageComponent implements OnInit {
 
     // Carregar dados para os selects se ainda não foram carregados
     if (this.turmaIdFiltro) {
+      // Modo professor (com filtro de turma)
       if (this.avaliacoesDaTurma.length === 0) {
         await this.carregarAvaliacoesDaTurma();
       }
       if (this.alunosMatriculados.length === 0) {
         await this.carregarAlunosMatriculados();
+      }
+    } else {
+      // Modo admin (sem filtro de turma)
+      if (this.todasAvaliacoes.length === 0) {
+        await this.carregarTodasAvaliacoes();
+      }
+      if (this.todasMatriculasTurma.length === 0) {
+        await this.carregarTodasMatriculasTurma();
       }
     }
 
@@ -479,6 +638,11 @@ export class NotasPageComponent implements OnInit {
     console.log('É professor:', this.authService.isProfessor());
     console.log('É admin:', this.authService.isAdmin());
 
+    // Debug do token
+    const token = localStorage.getItem('token');
+    console.log('Token completo:', token);
+    console.log('Usuário logado:', this.authService.getUsername());
+
     const dados = {
       nota: Number(this.formData.nota), // Converter para número
       idAvaliacao: Number(this.formData.idAvaliacao), // Converter para Long
@@ -501,6 +665,19 @@ export class NotasPageComponent implements OnInit {
     }
     if (dados.idMatriculaTurma <= 0 || isNaN(dados.idMatriculaTurma)) {
       throw new Error('ID da matrícula-turma deve ser um número válido');
+    }
+
+    // Verificar se já existe uma nota para esta combinação
+    const notaExistente = this.notas.find(
+      (nota) =>
+        nota.idAvaliacao === dados.idAvaliacao &&
+        nota.idMatriculaTurma === dados.idMatriculaTurma
+    );
+
+    if (notaExistente) {
+      throw new Error(
+        `Já existe uma nota para este aluno nesta avaliação (ID: ${notaExistente.id}). Para alterar a nota, use a opção de editar.`
+      );
     }
 
     const response = await this.authService.authenticatedFetch('/notas', {
@@ -526,10 +703,27 @@ export class NotasPageComponent implements OnInit {
         errorData = 'Erro desconhecido';
       }
 
-      // Se o erro for 403, mostrar mensagem específica
+      // Tratamento específico para diferentes tipos de erro
       if (response.status === 403) {
         throw new Error(
-          'Sem permissão para criar notas. Apenas administradores podem criar notas diretamente. Contate o administrador do sistema.'
+          'Acesso negado para criar notas. Verifique suas permissões.'
+        );
+      } else if (response.status === 409) {
+        // Conflict - já existe uma nota
+        throw new Error(
+          errorData ||
+            'Já existe uma nota para este aluno nesta avaliação. Para alterar a nota, use a opção de editar.'
+        );
+      } else if (
+        errorData &&
+        (errorData.includes('constraint') || errorData.includes('unique'))
+      ) {
+        throw new Error(
+          'Já existe uma nota para este aluno nesta avaliação. Para alterar a nota, use a opção de editar.'
+        );
+      } else if (response.status >= 500) {
+        throw new Error(
+          'Erro interno do servidor. Tente novamente em alguns instantes.'
         );
       }
 

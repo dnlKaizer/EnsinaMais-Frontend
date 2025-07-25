@@ -37,6 +37,23 @@ interface Matricula {
   idAluno: number;
 }
 
+// Interface para os dados da disciplina
+interface Disciplina {
+  id: number;
+  nome: string;
+  descricao: string;
+  cargaHoraria: number;
+}
+
+// Interface para os dados do professor
+interface Professor {
+  id: number;
+  nome: string;
+  email: string;
+  cpf: string;
+  departamento: string;
+}
+
 // Enum para os modos do modal
 enum ModalMode {
   VIEW = 'view',
@@ -60,6 +77,8 @@ enum ModalType {
 export class TurmasPageComponent {
   turmas: Turma[] = [];
   alunos: Aluno[] = [];
+  disciplinas: Disciplina[] = [];
+  professores: Professor[] = [];
   isLoading: boolean = false;
   errorMessage: string = '';
 
@@ -113,6 +132,8 @@ export class TurmasPageComponent {
    */
   async ngOnInit() {
     await this.carregar();
+    await this.carregarDisciplinas();
+    await this.carregarProfessores();
   }
 
   /**
@@ -177,10 +198,64 @@ export class TurmasPageComponent {
   }
 
   /**
+   * Carrega a lista de disciplinas disponíveis
+   */
+  async carregarDisciplinas(): Promise<void> {
+    try {
+      const response = await this.authService.authenticatedFetch(
+        '/disciplinas'
+      );
+      if (response.ok) {
+        this.disciplinas = await response.json();
+        console.log('Disciplinas carregadas:', this.disciplinas);
+      } else {
+        console.error('Erro ao carregar disciplinas:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar disciplinas:', error);
+    }
+  }
+
+  /**
+   * Carrega a lista de professores disponíveis
+   */
+  async carregarProfessores(): Promise<void> {
+    try {
+      const response = await this.authService.authenticatedFetch(
+        '/professores'
+      );
+      if (response.ok) {
+        this.professores = await response.json();
+        console.log('Professores carregados:', this.professores);
+      } else {
+        console.error('Erro ao carregar professores:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar professores:', error);
+    }
+  }
+
+  /**
    * Recarrega a lista de turmas
    */
   async recarregar(): Promise<void> {
     await this.carregar();
+  }
+
+  /**
+   * Obtém o nome da disciplina pelo ID
+   */
+  getNomeDisciplina(idDisciplina: number): string {
+    const disciplina = this.disciplinas.find((d) => d.id === idDisciplina);
+    return disciplina ? disciplina.nome : `Disciplina #${idDisciplina}`;
+  }
+
+  /**
+   * Obtém o nome do professor pelo ID
+   */
+  getNomeProfessor(idProfessor: number): string {
+    const professor = this.professores.find((p) => p.id === idProfessor);
+    return professor ? professor.nome : `Professor #${idProfessor}`;
   }
 
   /**
