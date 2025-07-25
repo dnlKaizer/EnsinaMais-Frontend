@@ -35,7 +35,7 @@ export interface UserData {
 })
 export class AuthService {
   // URL base da API backend
-  private apiUrl = 'http://localhost:8080';
+  private apiUrl = 'https://ensinamais-backend.onrender.com';
 
   constructor() {}
 
