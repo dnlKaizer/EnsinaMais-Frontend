@@ -1,4 +1,221 @@
+/* ===== LAYOUT GERAL ===== */
 .professor-dashboard {
   min-height: 100vh;
   background: var(--background-default);
+}
+
+/* ===== CARDS PERSONALIZADOS ===== */
+.custom-card {
+  background: linear-gradient(
+    135deg,
+    var(--color-very-light-blue) 0%,
+    rgba(187, 207, 252, 0.8) 100%
+  );
+  border: 2px solid var(--color-light-blue);
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0, 81, 255, 0.15);
+}
+
+.custom-card-header {
+  background: var(--color-dark-blue);
+  color: white;
+  border-radius: 13px 13px 0 0;
+  border-bottom: none;
+  padding: 1.2rem;
+  font-weight: 600;
+}
+
+.custom-card-body {
+  padding: 1.5rem;
+  background: #b9d7ffcc;
+  border-radius: 0 0 13px 13px;
+}
+
+/* ===== TABELA PERSONALIZADA ===== */
+.custom-table-container {
+  background: rgba(255, 255, 255, 0.9);
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0, 81, 255, 0.1);
+}
+
+.custom-table {
+  margin-bottom: 0;
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+  overflow: hidden;
+}
+
+.custom-table thead th {
+  background: var(--color-dark-blue);
+  color: white;
+  border: none;
+  padding: 1.2rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.85rem;
+}
+
+.custom-table tbody td {
+  padding: 1rem 1.2rem;
+  border: none;
+  background: rgba(255, 255, 255, 0.9);
+  vertical-align: middle;
+}
+
+/* ===== BOTÕES PERSONALIZADOS ===== */
+.custom-btn-primary {
+  background: linear-gradient(
+    135deg,
+    var(--color-dark-blue) 0%,
+    var(--color-light-blue) 100%
+  );
+  border: none;
+  border-radius: 8px;
+  color: white;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 81, 255, 0.3);
+}
+
+.custom-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 81, 255, 0.4);
+  color: white;
+}
+
+.custom-btn-success {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+}
+
+.custom-btn-success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+  color: white;
+}
+
+.custom-btn-info {
+  background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(23, 162, 184, 0.3);
+}
+
+.custom-btn-info:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(23, 162, 184, 0.4);
+  color: white;
+}
+
+.custom-btn-secondary {
+  background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  padding: 0.5rem 1.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+}
+
+.custom-btn-secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
+  color: white;
+}
+
+/* ===== TÍTULO PRINCIPAL ===== */
+.dashboard-title {
+  color: var(--color-dark-blue);
+  font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0, 81, 255, 0.1);
+  margin-bottom: 2rem;
+}
+
+/* ===== LOADING E ALERTAS ===== */
+.custom-loading {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 15px;
+  padding: 2rem;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(0, 81, 255, 0.1);
+}
+
+.custom-alert {
+  border-radius: 15px;
+  border: none;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  font-weight: 500;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.custom-alert-info {
+  background: linear-gradient(
+    135deg,
+    var(--color-very-light-blue) 0%,
+    rgba(187, 207, 252, 0.8) 100%
+  );
+  color: var(--color-dark-blue);
+  border-left: 5px solid var(--color-dark-blue);
+}
+
+/* ===== BADGES PERSONALIZADOS ===== */
+.badge.bg-light {
+  background: rgba(255, 255, 255, 0.9) !important;
+  color: var(--color-dark-blue) !important;
+  border: 1px solid var(--color-light-blue);
+}
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 768px) {
+  .dashboard-title {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .custom-card-header {
+    padding: 1rem;
+    font-size: 1rem;
+  }
+
+  .custom-card-body {
+    padding: 1rem;
+  }
+
+  .custom-table thead th {
+    padding: 0.8rem;
+    font-size: 0.8rem;
+  }
+
+  .custom-table tbody td {
+    padding: 0.8rem;
+    font-size: 0.9rem;
+  }
+
+  .d-flex.gap-2 {
+    flex-direction: column;
+    gap: 0.5rem !important;
+  }
+
+  .custom-btn-primary,
+  .custom-btn-success,
+  .custom-btn-info {
+    width: 100%;
+    margin-bottom: 0.25rem;
+  }
 }

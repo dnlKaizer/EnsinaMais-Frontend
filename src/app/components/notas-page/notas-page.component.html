@@ -250,13 +250,26 @@
               [disabled]="isSubmitting"
             >
               <option value="">Selecione uma avaliação</option>
-              <option
-                *ngFor="let avaliacao of avaliacoesDaTurma"
-                [value]="avaliacao.id"
-              >
-                {{ avaliacao.descricao }} (Valor máximo:
-                {{ avaliacao.notaMaxima }})
-              </option>
+              <!-- Para professor (com filtro de turma) -->
+              <ng-container *ngIf="turmaIdFiltro">
+                <option
+                  *ngFor="let avaliacao of avaliacoesDaTurma"
+                  [value]="avaliacao.id"
+                >
+                  {{ avaliacao.descricao }} (Valor máximo:
+                  {{ avaliacao.notaMaxima }})
+                </option>
+              </ng-container>
+              <!-- Para admin (sem filtro de turma) -->
+              <ng-container *ngIf="!turmaIdFiltro">
+                <option
+                  *ngFor="let avaliacao of todasAvaliacoes"
+                  [value]="avaliacao.id"
+                >
+                  {{ avaliacao.descricao }} (Valor máximo:
+                  {{ avaliacao.notaMaxima }})
+                </option>
+              </ng-container>
             </select>
           </div>
           <div class="col-6 mb-3">
@@ -270,12 +283,26 @@
               [disabled]="isSubmitting"
             >
               <option value="">Selecione um aluno</option>
-              <option
-                *ngFor="let aluno of alunosMatriculados"
-                [value]="aluno.idMatriculaTurma"
-              >
-                {{ aluno.nomeAluno }} ({{ aluno.cpfAluno }})
-              </option>
+              <!-- Para professor (com filtro de turma) -->
+              <ng-container *ngIf="turmaIdFiltro">
+                <option
+                  *ngFor="let aluno of alunosMatriculados"
+                  [value]="aluno.idMatriculaTurma"
+                >
+                  {{ aluno.nomeAluno }} ({{ aluno.cpfAluno }})
+                </option>
+              </ng-container>
+              <!-- Para admin (sem filtro de turma) -->
+              <ng-container *ngIf="!turmaIdFiltro">
+                <option
+                  *ngFor="let matricula of todasMatriculasTurma"
+                  [value]="matricula.idMatriculaTurma"
+                >
+                  {{ matricula.nomeAluno }} - {{ matricula.nomeTurma }} ({{
+                    matricula.cpfAluno
+                  }})
+                </option>
+              </ng-container>
             </select>
           </div>
           <div class="col-12 mb-3">
